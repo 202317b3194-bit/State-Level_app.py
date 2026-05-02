@@ -10,12 +10,12 @@ st.set_page_config(
 )
 
 # -------------------------------------------------
-# Load Data (CSV – correct filename & case)
+# Load Data (CSV – EXACT filename & case)
 # -------------------------------------------------
 @st.cache_data
 def load_data():
-    df = pd.read_csv("City_level_Data.csv")
-    df.columns = df.columns.str.strip()  # clean column names
+    df = pd.read_csv("City_level_data.csv")
+    df.columns = df.columns.str.strip()  # Clean column names
     return df
 
 
@@ -25,7 +25,7 @@ df = load_data()
 # App Title
 # -------------------------------------------------
 st.title("🏠 State‑Level Real Estate Insights")
-st.caption("State → City drill‑down | Person‑2 View")
+st.caption("Person‑2 | State → City drill‑down view")
 
 # -------------------------------------------------
 # Required Columns Validation
@@ -106,10 +106,12 @@ city_df = state_df[state_df["City"] == selected_city]
 c1, c2, c3 = st.columns(3)
 
 c1.metric("Listings", len(city_df))
+
 c2.metric(
     "Avg Price / Sqft",
     f"₹ {city_df['Price_per_Sqft'].mean():,.0f}"
 )
+
 c3.metric(
     "Avg BHK",
     f"{city_df['BHK'].mean():.1f}"
@@ -153,4 +155,4 @@ st.dataframe(
 # Footer
 # -------------------------------------------------
 st.markdown("---")
-st.caption("Person‑2 | State‑Level Detail View | Streamlit Dashboard")
+st.caption("✅ Person‑2 | State‑Level Detail View | Streamlit Dashboard")
