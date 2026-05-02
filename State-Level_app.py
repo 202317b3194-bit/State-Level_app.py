@@ -1,39 +1,36 @@
 import streamlit as st
 import pandas as pd
 
-# =====================================================
+# -------------------------------------------------
 # Page Configuration
-# =====================================================
+# -------------------------------------------------
 st.set_page_config(
-    page_title="State Level Real Estate View",
+    page_title="State-Level Real Estate Dashboard",
     layout="wide"
 )
 
-# =====================================================
-# Load Data (CSV ONLY)
-# =====================================================
+# -------------------------------------------------
+# Load Data (CSV – correct filename & case)
+# -------------------------------------------------
 @st.cache_data
 def load_data():
     df = pd.read_csv("City_level_Data.csv")
-
-    # Clean column names (important)
-    df.columns = df.columns.str.strip()
-
+    df.columns = df.columns.str.strip()  # clean column names
     return df
 
 
 df = load_data()
 
-# =====================================================
+# -------------------------------------------------
 # App Title
-# =====================================================
+# -------------------------------------------------
 st.title("🏠 State‑Level Real Estate Insights")
-st.caption("State → City → Locality drill‑down analysis")
+st.caption("State → City drill‑down | Person‑2 View")
 
-# =====================================================
-# Validate Required Columns
-# =====================================================
-required_cols = [
+# -------------------------------------------------
+# Required Columns Validation
+# -------------------------------------------------
+required_columns = [
     "State",
     "City",
     "Locality",
@@ -44,15 +41,15 @@ required_cols = [
     "Rental_Yield"
 ]
 
-missing_cols = [c for c in required_cols if c not in df.columns]
+missing_cols = [col for col in required_columns if col not in df.columns]
 
 if missing_cols:
-    st.error(f"Missing columns in CSV: {missing_cols}")
+    st.error(f"Missing required columns in CSV: {missing_cols}")
     st.stop()
 
-# =====================================================
+# -------------------------------------------------
 # State Selection
-# =====================================================
+# -------------------------------------------------
 states = sorted(df["State"].dropna().unique())
 
 selected_state = st.selectbox(
@@ -62,10 +59,10 @@ selected_state = st.selectbox(
 
 state_df = df[df["State"] == selected_state]
 
-# =====================================================
-# State KPIs
-# =====================================================
-st.subheader(f"📊 {selected_state} – Key Metrics")
+# -------------------------------------------------
+# State‑Level KPIs
+# -------------------------------------------------
+st.subheader(f"📊 {selected_state} – State Metrics")
 
 k1, k2, k3, k4 = st.columns(4)
 
@@ -89,10 +86,10 @@ k4.metric(
     len(state_df)
 )
 
-# =====================================================
-# City Selection
-# =====================================================
-st.subheader("🏙 City‑Level View")
+# -------------------------------------------------
+# City Selection (Filtered by State)
+# -------------------------------------------------
+st.subheader("🏙 City‑Level Drill‑Down")
 
 cities = sorted(state_df["City"].dropna().unique())
 
@@ -103,9 +100,9 @@ selected_city = st.selectbox(
 
 city_df = state_df[state_df["City"] == selected_city]
 
-# =====================================================
-# City KPIs
-# =====================================================
+# -------------------------------------------------
+# City‑Level KPIs
+# -------------------------------------------------
 c1, c2, c3 = st.columns(3)
 
 c1.metric("Listings", len(city_df))
@@ -118,20 +115,22 @@ c3.metric(
     f"{city_df['BHK'].mean():.1f}"
 )
 
-# =====================================================
-# Price Distribution Chart
-# =====================================================
-st.subheader(f"📈 {selected_city} – Price per Sqft Distribution")
+# -------------------------------------------------
+# Price per Sqft by Locality (Chart)
+# -------------------------------------------------
+st.subheader(f"📈 {selected_city} – Avg Price per Sqft by Locality")
 
-st.bar_chart(
+price_chart = (
     city_df.groupby("Locality")["Price_per_Sqft"]
     .mean()
     .sort_values(ascending=False)
 )
 
-# =====================================================
-# Locality-Level Table
-# =====================================================
+st.bar_chart(price_chart)
+
+# -------------------------------------------------
+# Locality‑Level Table
+# -------------------------------------------------
 st.subheader(f"📍 {selected_city} – Property Listings")
 
 display_cols = [
@@ -150,8 +149,8 @@ st.dataframe(
     use_container_width=True
 )
 
-# =====================================================
+# -------------------------------------------------
 # Footer
-# =====================================================
+# -------------------------------------------------
 st.markdown("---")
-st.caption("State-Level Real Estate Dashboard | Streamlit")
+st.caption("Person‑2 | State‑Level Detail View | Streamlit Dashboard")
